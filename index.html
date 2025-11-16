@@ -11,6 +11,7 @@
             margin: 0 auto;
             padding: 20px;
             background-color: #fafc60; /* Azul muito claro */
+            overflow-x: hidden;
         }
         
         h1 {
@@ -24,6 +25,8 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 51, 102, 0.2); /* Sombra azul */
             border: 1px solid #b3d9ff; /* Borda azul clara */
+            position: relative;
+            z-index: 1;
         }
         
         h3 {
@@ -67,6 +70,8 @@
             margin-top: 20px;
             display: none;
             border: 1px solid #b3d9ff;
+            position: relative;
+            z-index: 1;
         }
         
         .links {
@@ -96,6 +101,70 @@
         #pontuacao strong {
             color: #0066cc;
         }
+        
+        /* Estilos para animações */
+        .celebration-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        /* Balões */
+        .balloon {
+            position: absolute;
+            width: 30px;
+            height: 40px;
+            border-radius: 50%;
+            bottom: -50px;
+            animation: balloon-rise 8s ease-in-out forwards;
+        }
+        
+        .balloon::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        @keyframes balloon-rise {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(20deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Confetes */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            opacity: 0;
+            animation: confetti-fall 5s linear forwards;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -120,7 +189,6 @@
             <input type="radio" name="q3" value="b" id="q3b"> <label for="q3b">Bete Carvalho</label> <br>
             <input type="radio" name="q3" value="c" id="q3c"> <label for="q3c">Alcione</label> <br>
             <input type="radio" name="q3" value="d" id="q3d"> <label for="q3d">Ivone Lara</label> <br>
-
 
             <br>
             <div class="btn">
@@ -147,7 +215,6 @@
                 "q1": "b", 
                 "q2": "b",
                 "q3": "c",
-               
             };
             
             let pontos = 0;
@@ -168,6 +235,8 @@
             let mensagem = "";
             if (pontos === 3) {
                 mensagem = "Excelente! Você conhece muito bem a Arenil!";
+                // Ativar animação de balões e confetes
+                createCelebration();
             } else if (pontos >= 2) {
                 mensagem = "Bom trabalho! Mas ainda pode melhorar.";
             } else {
@@ -187,7 +256,110 @@
             document.querySelector('.quiz-container').style.display = 'block';
             document.getElementById('resultado').style.display = 'none';
             document.getElementById('quizForm').reset();
+            
+            // Remover animações se existirem
+            const celebrationContainer = document.querySelector('.celebration-container');
+            if (celebrationContainer) {
+                celebrationContainer.remove();
+            }
         });
+        
+        // Função para criar animação de balões e confetes
+        function createCelebration() {
+            // Criar container para as animações
+            const celebrationContainer = document.createElement('div');
+            celebrationContainer.className = 'celebration-container';
+            document.body.appendChild(celebrationContainer);
+            
+            // Cores para balões e confetes
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8800'];
+            
+            // Criar balões
+            for (let i = 0; i < 30; i++) {
+                createBalloon(celebrationContainer, colors);
+            }
+            
+            // Criar confetes
+            for (let i = 0; i < 150; i++) {
+                createConfetti(celebrationContainer, colors);
+            }
+        }
+        
+        // Função para criar um balão
+        function createBalloon(container, colors) {
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+            
+            // Posição horizontal aleatória
+            const left = Math.random() * 100;
+            balloon.style.left = `${left}vw`;
+            
+            // Cor aleatória
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            balloon.style.backgroundColor = color;
+            
+            // Atraso aleatório para animação
+            const delay = Math.random() * 5;
+            balloon.style.animationDelay = `${delay}s`;
+            
+            // Duração aleatória para animação
+            const duration = 5 + Math.random() * 5;
+            balloon.style.animationDuration = `${duration}s`;
+            
+            container.appendChild(balloon);
+            
+            // Remover balão após a animação
+            setTimeout(() => {
+                if (balloon.parentNode) {
+                    balloon.remove();
+                }
+            }, (duration + delay) * 1000);
+        }
+        
+        // Função para criar um confete
+        function createConfetti(container, colors) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            
+            // Posição horizontal aleatória
+            const left = Math.random() * 100;
+            confetti.style.left = `${left}vw`;
+            
+            // Cor aleatória
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.backgroundColor = color;
+            
+            // Atraso aleatório para animação
+            const delay = Math.random() * 5;
+            confetti.style.animationDelay = `${delay}s`;
+            
+            // Duração aleatória para animação
+            const duration = 3 + Math.random() * 4;
+            confetti.style.animationDuration = `${duration}s`;
+            
+            // Forma aleatória (quadrado ou retângulo)
+            const size = 5 + Math.random() * 10;
+            const ratio = 0.5 + Math.random() * 1.5;
+            
+            if (Math.random() > 0.5) {
+                // Quadrado
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+            } else {
+                // Retângulo
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size * ratio}px`;
+            }
+            
+            container.appendChild(confetti);
+            
+            // Remover confete após a animação
+            setTimeout(() => {
+                if (confetti.parentNode) {
+                    confetti.remove();
+                }
+            }, (duration + delay) * 1000);
+        }
     </script>
 </body>
 </html>
